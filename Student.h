@@ -9,8 +9,10 @@ private:
 	string secondName, iniciales;
 	int numberGroup;
 	Marray<std::pair<string, int>> objects;
+	bool isFellow, isDeduction;
 
 	void inputObjects();
+	void setStatus();
 public:
 	Student();
 	Student(string secondName, string iniciales, int numberGroup, Marray<std::pair<string, int>> objects);
@@ -31,7 +33,10 @@ public:
 	void setNumberGroup(int numberGroup) { this->numberGroup = numberGroup; }
 
 	Marray<std::pair<string, int>> gettObjects() { return objects; }
-	void setObjects(Marray<std::pair<string, int>>& objects) { this->objects = objects; }
+	void setObjects(Marray<std::pair<string, int>>& objects) { this->objects = objects; setStatus(); }
+
+	bool getIsFellow() { return isFellow; }
+	bool getIsDeduction() { return isDeduction; }
 
 	double getAverageMark();
 

@@ -1,6 +1,6 @@
 #include "Student.h"
 
-Student::Student() : secondName("Не задано"), iniciales("Не задано"), numberGroup(0)
+Student::Student() : secondName("Не задано"), iniciales("Не задано"), numberGroup(0), isFellow(false), isDeduction(false)
 {
 	cout << "Вызван конструктор Student" << endl;
 }
@@ -8,10 +8,12 @@ Student::Student() : secondName("Не задано"), iniciales("Не задано"), numberGrou
 Student::Student(string secondName, string iniciales, int numberGroup, Marray<std::pair<string, int>> objects) :
 	secondName(secondName), iniciales(iniciales), numberGroup(numberGroup), objects(objects)
 {
+	setStatus();
 	cout << "Вызван конструктор Student" << endl;
 }
 
-Student::Student(const Student& student) : secondName(student.secondName), iniciales(student.iniciales), numberGroup(student.numberGroup), objects(student.objects)
+Student::Student(const Student& student) : secondName(student.secondName), iniciales(student.iniciales),
+numberGroup(student.numberGroup), objects(student.objects), isFellow(student.isFellow), isDeduction(student.isDeduction)
 {
 	cout << "Вызван конструктор копирования Student" << endl;
 }
@@ -27,6 +29,7 @@ void Student::inputFromConsole()
 	inputData("Введите инициалы: ", iniciales);
 	inputData("Введите номер группы: ", numberGroup, 0, INT32_MAX);
 	inputObjects();
+	setStatus();
 }
 
 void Student::printToConsole()
@@ -36,6 +39,10 @@ void Student::printToConsole()
 	cout << "Предметы: ";
 	for (int i = 0; i < objects.getSize(); i++)
 		cout << i + 1 << ". " << objects[i].first << " " << objects[i].second << endl;
+	if (isFellow)
+		cout << "На стипендии" << endl;
+	if (isDeduction)
+		cout << "На отчисление" << endl;
 }
 
 void Student::change()
@@ -67,6 +74,7 @@ void Student::change()
 			break;
 		case 4:
 			inputObjects();
+			setStatus();
 			break;
 		case 6:
 			printToConsole();
@@ -92,6 +100,8 @@ Student& Student::operator=(const Student& student) {
 	iniciales = student.iniciales;
 	numberGroup = student.numberGroup;
 	objects = student.objects;
+	isFellow = student.isFellow;
+	isDeduction = student.isDeduction;
 	return *this;
 }
 
@@ -102,12 +112,25 @@ bool Student::operator>(Student& student) {
 void Student::inputObjects() {
 	objects.clear();
 	int countObjects;
-	inputData("Введите количество городов: ", countObjects, 0, INT32_MAX);
+	inputData("Введите количество предметов: ", countObjects, 1, INT32_MAX);
 	for (int i = 0; i < countObjects; i++) {
 		cout << "Введите " << i + 1 << " предмет: ";
 		string tmp;
 		getline(cin, tmp);
 		cout << "Введите оценку по этому предмету: ";
-		objects += make_pair(tmp, safeInput(1, 5));
+		objects += make_pair(tmp, safeInput(2, 5));
 	}
+	setStatus();
+}
+
+void Student::setStatus() {
+	isFellow = false;
+	isDeduction = false;
+	int countMarks[4] = { 0, 0, 0, 0 };
+	for (int i = 0; i < objects.getSize(); i++)
+		countMarks[objects[i].second - 2]++;
+	if (countMarks[0] > 2)
+		isDeduction = true;
+	if (countMarks[0] == 0 && countMarks[1] == 0)
+		isFellow = true;
 }
